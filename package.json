@@ -1,0 +1,20 @@
+{
+    "name": "unlayer-livewire-assets",
+    "private": true,
+    "version": "0.1.0",
+    "description": "Internal asset build for community-sdks/unlayer-livewire.",
+    "type": "module",
+    "scripts": {
+        "build": "tsup resources/js/index.ts --format esm,cjs --dts --out-dir dist",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@community-sdks/unlayer-alpinejs": "^0.1.0",
+        "@community-sdks/unlayer-ts": "^0.1.0"
+    },
+    "devDependencies": {
+        "tsup": "^8.3.5",
+        "typescript": "^5.7.2"
+    },
+    "license": "MIT"
+}
