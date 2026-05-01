@@ -1,5 +1,5 @@
 @once
-    <script type="module" src="{{ route('unlayer-livewire.assets.index') }}"></script>
+    <script type="module" src="{{ asset('unlayer-livewire.js') }}"></script>
 @endonce
 
 <div
