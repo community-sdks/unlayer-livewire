@@ -9,8 +9,8 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "@community-sdks/unlayer-alpinejs": "^0.1.1",
-        "@community-sdks/unlayer-ts": "^0.1.1"
+        "@community-sdks/unlayer-alpinejs": "^0.1.2",
+        "@community-sdks/unlayer-ts": "^0.1.2"
     },
     "devDependencies": {
         "tsup": "^8.3.5",

@@ -3,12 +3,14 @@
 namespace CommunitySdks\UnlayerLivewire\Concerns;
 
 use CommunitySdks\UnlayerLivewire\Support\UnlayerState;
+use Livewire\Attributes\Modelable;
 
 trait HasUnlayerState
 {
     /**
      * @var array{html: string, design: array<string, mixed>}
      */
+    #[Modelable]
     public array $state = [
         'html' => '',
         'design' => [],

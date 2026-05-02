@@ -1,0 +1,6 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::view('/unlayer-livewire/basic', 'unlayer-livewire-examples.basic');
+Route::view('/unlayer-livewire/templates', 'unlayer-livewire-examples.templates');

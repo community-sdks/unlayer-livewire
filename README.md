@@ -4,6 +4,11 @@ Livewire wrapper for [`@community-sdks/unlayer-alpinejs`](https://www.npmjs.com/
 
 This package gives Laravel apps a Livewire component for the Unlayer editor while keeping the editor lifecycle in the TypeScript SDK and Alpine adapter.
 
+## Version Compatibility
+
+- `@community-sdks/unlayer-livewire` uses `@community-sdks/unlayer-alpinejs` and `@community-sdks/unlayer-ts` internally.
+- Keep the published browser asset in sync by running the package install command again after upgrading the package.
+
 ## Getting Started
 
 Install the PHP package:
@@ -22,6 +27,12 @@ This publishes the compiled browser file to:
 
 ```txt
 public/unlayer-livewire.js
+```
+
+After upgrading the package or rebuilding the browser asset locally, publish the new file again:
+
+```bash
+php artisan vendor:publish --tag=unlayer-livewire-assets --force
 ```
 
 If you want to customize upload storage, publish the config file too:
@@ -74,6 +85,20 @@ protected function casts(): array
     ];
 }
 ```
+
+## Examples
+
+Laravel-ready example snippets are included in this repository:
+
+```txt
+examples/routes/web.php.stub
+examples/views/basic.blade.php
+examples/views/templates.blade.php
+```
+
+Copy the example routes into your app's `routes/web.php`, then copy the example views into `resources/views/unlayer-livewire-examples/`.
+
+The basic example renders the editor with an empty state. The template example enables the built-in picker UI and the same-origin Laravel template proxy.
 
 ## Stock Templates
 
@@ -183,6 +208,8 @@ closeTemplates()
 setTemplateSearch(search)
 ```
 
+When `templatePicker` is enabled, the built-in picker UI from `@community-sdks/unlayer-ts` is mounted inside the editor surface. The Livewire wrapper delegates to the updated Alpine adapter for opening, closing, and refreshing that picker.
+
 ## Livewire Methods
 
 The PHP Livewire component exposes:
@@ -224,6 +251,12 @@ Build the browser adapter:
 ```bash
 npm install
 npm run build
+```
+
+Republish the built asset into a Laravel app:
+
+```bash
+php artisan vendor:publish --tag=unlayer-livewire-assets --force
 ```
 
 Run TypeScript checks:

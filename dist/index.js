@@ -27,7 +27,7 @@ var UnlayerLivewireBundle = (() => {
     uploadThroughLivewire: () => uploadThroughLivewire
   });
 
-  // ../zpm-unlayer/dist/index.js
+  // node_modules/@community-sdks/unlayer-ts/dist/index.js
   var defaultScriptUrl = "https://editor.unlayer.com/embed.js?2";
   var scriptPromise = null;
   var UnlayerStockTemplateClient = class {
@@ -321,7 +321,7 @@ var UnlayerLivewireBundle = (() => {
       close.type = "button";
       close.className = "unlayer-sdk-template-close";
       close.setAttribute("aria-label", "Close templates");
-      close.textContent = "x";
+      close.textContent = "\xD7";
       close.addEventListener("click", () => this.closeTemplatePicker());
       const searchInput = document.createElement("input");
       searchInput.type = "search";
@@ -560,6 +560,8 @@ var UnlayerLivewireBundle = (() => {
         }
 
         .unlayer-sdk-template-search {
+            display: block;
+            width: calc(100% - 36px);
             margin: 16px 18px 8px;
             min-height: 40px;
             border: 1px solid #d1d5db;
@@ -568,6 +570,17 @@ var UnlayerLivewireBundle = (() => {
             background: #ffffff;
             color: #111827;
             font: inherit;
+            box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        .unlayer-sdk-template-search::-webkit-search-decoration,
+        .unlayer-sdk-template-search::-webkit-search-cancel-button,
+        .unlayer-sdk-template-search::-webkit-search-results-button,
+        .unlayer-sdk-template-search::-webkit-search-results-decoration {
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .unlayer-sdk-template-status {
@@ -651,9 +664,10 @@ var UnlayerLivewireBundle = (() => {
   }
   var index_default = UnlayerEditor;
 
-  // ../unlayer-alpinejs/dist/index.js
+  // node_modules/@community-sdks/unlayer-alpinejs/dist/index.js
   function createUnlayerAlpineComponent(options) {
     const autoMount = options.autoMount ?? true;
+    const usesBuiltInTemplatePicker = options.templatePicker?.enabled ?? Boolean(options.templateSearch);
     return {
       editor: null,
       state: normalizeState2(options.state),
@@ -728,6 +742,10 @@ var UnlayerLivewireBundle = (() => {
       },
       async searchTemplates(searchOptions = {}) {
         const editor = await this.mount();
+        if (searchOptions.search !== void 0) {
+          this.templateSearch = searchOptions.search;
+          this.templateSearchOptions.search = searchOptions.search;
+        }
         this.templatesLoading = true;
         try {
           const templates = await editor.searchTemplates({
@@ -759,16 +777,23 @@ var UnlayerLivewireBundle = (() => {
         return this.loadTemplate(typeof template === "string" ? template : template.slug);
       },
       async openTemplates() {
+        const editor = await this.mount();
         this.templatesOpen = true;
+        if (usesBuiltInTemplatePicker) {
+          await editor.openTemplatePicker();
+          return;
+        }
         if (this.templates.length === 0) {
           await this.refreshTemplates();
         }
       },
       closeTemplates() {
         this.templatesOpen = false;
+        this.editor?.closeTemplatePicker();
       },
       async setTemplateSearch(search) {
         this.templateSearch = search;
+        this.templateSearchOptions.search = search;
         return this.searchTemplates({ search });
       }
     };
