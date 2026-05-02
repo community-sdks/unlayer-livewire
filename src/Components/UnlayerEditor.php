@@ -36,9 +36,15 @@ class UnlayerEditor extends Component
     public array $templateSearch = [];
 
     /**
+     * @var array<string, mixed>
+     */
+    public array $templatePicker = [];
+
+    /**
      * @param  array<string, mixed>|null  $state
      * @param  array<string, mixed>  $unlayerOptions
      * @param  array<string, mixed>  $templateSearch
+     * @param  array<string, mixed>  $templatePicker
      */
     public function mount(
         ?array $state = null,
@@ -47,6 +53,7 @@ class UnlayerEditor extends Component
         bool $syncLive = false,
         array $unlayerOptions = [],
         array $templateSearch = [],
+        array $templatePicker = [],
         ?string $editorId = null,
     ): void {
         $this->state = $this->normalizeUnlayerState($state);
@@ -55,7 +62,8 @@ class UnlayerEditor extends Component
         $this->syncLive = $syncLive;
         $this->unlayerOptions = $unlayerOptions;
         $this->templateSearch = $templateSearch;
-        $this->editorId = $editorId ?: 'unlayer-livewire-' . Str::uuid()->toString();
+        $this->templatePicker = $templatePicker;
+        $this->editorId = $editorId ?: 'unlayer-livewire-'.Str::uuid()->toString();
     }
 
     public function render(): View

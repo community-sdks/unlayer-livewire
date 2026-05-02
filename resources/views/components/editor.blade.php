@@ -1,6 +1,6 @@
-@once
-    <script type="module" src="{{ asset('unlayer-livewire.js') }}"></script>
-@endonce
+@assets
+    <script src="{{ asset('unlayer-livewire.js') }}"></script>
+@endassets
 
 <div
     wire:ignore.self
@@ -10,6 +10,8 @@
         displayMode: @js($displayMode),
         unlayerOptions: @js($unlayerOptions),
         templateSearch: @js($templateSearch),
+        templatePicker: @js($templatePicker),
+        templateClient: window.UnlayerLivewire.templates(),
         uploadImage: window.UnlayerLivewire.upload($wire, 'imageUpload'),
         onChange: window.UnlayerLivewire.sync($wire, 'state', @js($syncLive)),
     })"

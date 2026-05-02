@@ -2,8 +2,22 @@ import { defineConfig } from 'tsup'
 
 export default defineConfig({
     entry: ['resources/js/index.ts'],
-    format: ['esm', 'cjs'],
-    dts: true,
+    format: ['iife'],
+    globalName: 'UnlayerLivewireBundle',
+    platform: 'browser',
+    target: 'es2020',
+    bundle: true,
+    splitting: false,
+    dts: false,
     clean: true,
-    sourcemap: true,
+    sourcemap: false,
+    noExternal: [
+        '@community-sdks/unlayer-alpinejs',
+        '@community-sdks/unlayer-ts',
+    ],
+    outExtension() {
+        return {
+            js: '.js',
+        }
+    },
 })

@@ -77,7 +77,18 @@ protected function casts(): array
 
 ## Stock Templates
 
-Template search and loading comes from the underlying TypeScript SDK and works through the Alpine adapter. You can pass default filters:
+Template search and loading comes from the underlying TypeScript SDK and works through the Alpine adapter. Unlayer's public stock template search endpoint does not allow browser CORS requests, so this package includes Laravel proxy routes:
+
+```txt
+GET /unlayer-livewire/templates
+GET /unlayer-livewire/templates/{template}
+```
+
+These are same-origin relative URLs. For example, `/unlayer-livewire/templates` becomes `https://your-app.test/unlayer-livewire/templates`.
+
+If you replace the built-in template client with a backend on another domain, use full URLs and make sure that backend allows CORS for your frontend domain.
+
+The browser calls these same-origin routes, and Laravel calls Unlayer from the backend. You can pass default filters and enable the built-in editor tab:
 
 ```blade
 <livewire:unlayer-livewire.editor
@@ -91,8 +102,68 @@ Template search and loading comes from the underlying TypeScript SDK and works t
         'collection' => '',
         'sort' => 'recent',
     ]"
+    :template-picker="[
+        'showTrigger' => true,
+        'triggerLabel' => 'Templates',
+    ]"
 />
 ```
+
+You can customize the route prefix and middleware in `config/unlayer-livewire.php`:
+
+```php
+'routes' => [
+    'prefix' => 'unlayer-livewire',
+    'middleware' => ['web'],
+],
+```
+
+The template trigger is shown in a small toolbar above the editor. The picker opens over the editor itself, without a page backdrop.
+
+Behind the proxy, `/unlayer-livewire/templates` calls:
+
+```txt
+POST https://unlayer.com/templates/search
+Content-Type: application/json
+```
+
+The Livewire `template-search` values map to Unlayer's request body:
+
+```txt
+search     -> filter.name
+type       -> filter.type
+premium    -> filter.premium, "true" when true, "" when false
+limit      -> perPage
+offset     -> page, calculated as floor(offset / limit) + 1
+collection -> filter.collection
+sort       -> filter.sortBy
+```
+
+Example upstream body:
+
+```json
+{
+    "page": 1,
+    "perPage": 20,
+    "filter": {
+        "premium": "",
+        "collection": "",
+        "name": "newsletter",
+        "sortBy": "recent",
+        "type": "email"
+    }
+}
+```
+
+Template thumbnails use `https://api.unlayer.com/v2/stock-templates/{slug}/thumbnail?width=500`.
+
+`/unlayer-livewire/templates/{template}` loads the design through:
+
+```txt
+POST https://studio.unlayer.com/api/v1/graphql
+```
+
+Using `StockTemplate(slug: $slug) { StockTemplatePages { design } }`.
 
 The Alpine component exposes:
 

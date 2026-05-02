@@ -17,4 +17,19 @@ return [
         'path' => 'unlayer-livewire',
         'visibility' => 'public',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Template Proxy Routes
+    |--------------------------------------------------------------------------
+    |
+    | Stock template search needs to run through Laravel because Unlayer's
+    | template search endpoint does not allow browser CORS requests.
+    |
+    */
+
+    'routes' => [
+        'prefix' => 'unlayer-livewire',
+        'middleware' => ['web'],
+    ],
 ];

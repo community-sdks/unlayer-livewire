@@ -3,7 +3,7 @@ import {
     type UnlayerAlpineComponent,
     type UnlayerAlpineOptions,
 } from '@community-sdks/unlayer-alpinejs'
-import type { UnlayerState } from '@community-sdks/unlayer-ts'
+import { HttpTemplateClient, type TemplateClient, type UnlayerState } from '@community-sdks/unlayer-ts'
 
 type LivewireProgressEvent = CustomEvent<{
     progress: number
@@ -14,15 +14,19 @@ type LivewireWire = {
 
     $call(method: string, ...params: unknown[]): Promise<unknown>
 
-    $upload(
-        name: string,
-        file: File,
-        finish: (uploadedFilename: string) => void,
-        error?: (error: unknown) => void,
-        progress?: (event: LivewireProgressEvent) => void,
-        cancelled?: () => void,
-    ): void
+    $upload?: LivewireUploadMethod
+
+    upload?: LivewireUploadMethod
 }
+
+type LivewireUploadMethod = (
+    name: string,
+    file: File,
+    finish: (uploadedFilename: string) => void,
+    error?: (error: unknown) => void,
+    progress?: (event: LivewireProgressEvent) => void,
+    cancelled?: () => void,
+) => void
 
 type AlpineLike = {
     data(
@@ -31,8 +35,12 @@ type AlpineLike = {
     ): void
 }
 
+let registeredAlpine = false
+
 export type UnlayerLivewireBridge = {
     upload(wire: LivewireWire, property?: string): (file: File) => Promise<string>
+
+    templates(searchUrl?: string, loadUrl?: string): TemplateClient
 
     sync(
         wire: LivewireWire,
@@ -54,6 +62,13 @@ export function createUnlayerLivewireBridge(): UnlayerLivewireBridge {
             }
         },
 
+        templates(
+            searchUrl = '/unlayer-livewire/templates',
+            loadUrl = '/unlayer-livewire/templates',
+        ) {
+            return new HttpTemplateClient(searchUrl, loadUrl)
+        },
+
         sync(wire: LivewireWire, property = 'state', live = false) {
             return function syncState(state: UnlayerState): Promise<unknown> | void {
                 return wire.$set(property, state, live)
@@ -73,8 +88,15 @@ export function uploadThroughLivewire(
     property: string,
     file: File,
 ): Promise<string> {
+    const upload = wire.$upload ?? wire.upload
+
+    if (! upload) {
+        return Promise.reject(new Error('Livewire upload API is not available.'))
+    }
+
     return new Promise((resolve, reject) => {
-        wire.$upload(
+        upload.call(
+            wire,
             property,
             file,
             (uploadedFilename: string) => {
@@ -91,7 +113,12 @@ export function registerUnlayerLivewire(
     Alpine: AlpineLike,
     alpineComponentName = 'unlayerEditor',
 ): void {
+    if (registeredAlpine) {
+        return
+    }
+
     registerUnlayerAlpine(Alpine, alpineComponentName)
+    registeredAlpine = true
 
     window.UnlayerLivewire = createUnlayerLivewireBridge()
 }
@@ -108,6 +135,10 @@ document.addEventListener('alpine:init', () => {
         registerUnlayerLivewire(window.Alpine)
     }
 })
+
+if (window.Alpine) {
+    registerUnlayerLivewire(window.Alpine)
+}
 
 if (! window.UnlayerLivewire) {
     window.UnlayerLivewire = createUnlayerLivewireBridge()
