@@ -2,6 +2,21 @@
     <script src="{{ asset('unlayer-livewire.js') }}"></script>
 @endassets
 
+@php
+    $syncState = <<<'JS'
+        (state) => {
+            window.dispatchEvent(new CustomEvent('unlayer-livewire:exported', {
+                detail: {
+                    id: EDITOR_ID,
+                    state,
+                },
+            }))
+
+            return window.UnlayerLivewire.sync($wire, 'state', SYNC_LIVE)(state)
+        }
+    JS;
+@endphp
+
 <div
     wire:ignore.self
     x-data="unlayerEditor({
@@ -13,7 +28,7 @@
         templatePicker: @js($templatePicker),
         templateClient: window.UnlayerLivewire.templates(),
         uploadImage: window.UnlayerLivewire.upload($wire, 'imageUpload'),
-        onChange: window.UnlayerLivewire.sync($wire, 'state', @js($syncLive)),
+        onChange: {{ str_replace(['EDITOR_ID', 'SYNC_LIVE'], [json_encode($editorId, JSON_THROW_ON_ERROR), json_encode($syncLive, JSON_THROW_ON_ERROR)], $syncState) }},
     })"
     x-on:unlayer-livewire:set-state.window="
         if ($event.detail.id === @js($editorId)) {
